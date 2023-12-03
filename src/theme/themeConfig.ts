@@ -9,6 +9,9 @@ const theme: ThemeConfig = {
   components: {
     Layout: {
       headerBg: 'white'
+    },
+    Statistic: {
+      contentFontSize: 22
     }
   }
 };

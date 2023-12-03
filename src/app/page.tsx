@@ -6,6 +6,8 @@ import Meta from "antd/es/card/Meta";
 import { Game } from "@/interfaces/game_interfaces";
 import { notion } from "@/lib/Notion";
 import { PageObjectResponse } from "@notionhq/client/build/src/api-endpoints";
+import Title from "antd/lib/typography/Title";
+import Link from "next/link";
 
 const tagList = [
   "New Games",
@@ -20,15 +22,17 @@ export default async function Home() {
         vertical
         gap="middle"
         justify={"space-between"}
-        style={{ marginTop: 20, marginLeft: 20 }}
+        style={{ marginTop: 20, marginLeft: 20, marginRight: 0 }}
       >
         {tagList.map((e, i) => {
           return (
             <>
-              <Typography>{e}</Typography>
+              <Typography>
+                <Title level={2}>{e}</Title>
+              </Typography>
               <Row
                 wrap={false}
-                gutter={20}
+                justify="start"
                 style={{
                   width: "90vw",
                   overflow: "auto",
@@ -44,34 +48,63 @@ export default async function Home() {
   );
 }
 
+const cardWidth = "400px";
+
 export async function GameCards({ props }: { props: any }) {
   const games: Array<Game> = await getGamesByTag(props.tag);
 
   return games.map((game, i) => {
     return (
-      <Col>
-        <Card
-          hoverable
-          style={{ width: "300px" }}
-          cover={
-            <Flex
-              justify='flex-start'
-              style={{
-                width: '300px',
-                overflow: "hidden",
-                height: "200px",
-              }}
-            >
-              <Image alt={game.name} src={game.coverUrl} height='100%'
-              style={{
-                objectFit: 'cover'
-              }}
-              />
-            </Flex>
-          }
-        >
-          <Meta title={game.name} />
-        </Card>
+      <Col
+        style={{
+          marginBottom: "20px",
+          width: cardWidth,
+          marginRight: "30px",
+          marginLeft: "10px",
+        }}
+      >
+        <Link href={"/game?title=" + game.name}>
+          <Card
+            hoverable
+            style={{ width: cardWidth }}
+            cover={
+              <Flex
+                justify="flex-start"
+                style={{
+                  width: "100%",
+                  overflow: "hidden",
+                  height: "200px",
+                }}
+              >
+                <Image
+                  alt={game.name}
+                  src={game.coverUrl}
+                  width="100%"
+                  preview={false}
+                  style={{
+                    objectFit: "cover",
+                  }}
+                />
+              </Flex>
+            }
+          >
+            <Meta
+              title={
+                <Title
+                  level={5}
+                  ellipsis={{
+                    tooltip: true,
+                  }}
+                  style={{
+                    width: "100%",
+                  }}
+                >
+                  {game.name}
+                </Title>
+              }
+            />
+          </Card>
+        </Link>
       </Col>
     );
   });
