@@ -1,6 +1,6 @@
 "use client";
 
-import { Flex, Image, List, Select } from "antd";
+import { Flex, Image, List, Select, Spin } from 'antd'
 import React, { useEffect, useState } from "react";
 import Title from "antd/lib/typography/Title";
 import { HowLongToBeatEntry } from "howlongtobeat";
@@ -8,8 +8,10 @@ import { useRouter } from "next/navigation";
 
 export function SearchBar() {
   function onChange(value: string) {
-    setKW(value);
-    setLoading(true);
+    if (value !== '') {
+      setKW(value);
+      setLoading(true);
+    }
   }
 
   const [kw, setKW] = useState("");
@@ -39,7 +41,11 @@ export function SearchBar() {
         filterOption={false}
         size={"large"}
         style={{ width: "500px" }}
-        dropdownRender={(e) => <DropList data={data} />}
+        dropdownRender={(e) => (
+          <Spin size={'large'} spinning={loading}>
+            <DropList data={data} />
+          </Spin>
+        )}
         onSearch={onChange}
         loading={loading}
         onBlur={() => {
@@ -69,14 +75,7 @@ export function DropList({ data }: any) {
           style={{ width: "100%" }}
           renderItem={(item: HowLongToBeatEntry) => {
             return (
-              <a
-                onClick={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  router.replace("/game?title=" + item.name);
-                  router.refresh();
-                }}
-              >
+              <a href={"/game/" + encodeURI(item.name)}>
                 <List.Item
                   key={item.id}
                   extra={

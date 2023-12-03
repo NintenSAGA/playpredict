@@ -28,15 +28,14 @@ const platformDict: Record<number, { name: string; color: string }> = {
 };
 
 export default async function Page({
+  params,
   searchParams,
 }: {
+  params: { slug: string };
   searchParams?: { [key: string]: string | string[] | undefined };
 }) {
-  if (!searchParams || !searchParams.title) {
-    redirect("/");
-  }
+  const title = decodeURIComponent(params.slug);
 
-  const title = searchParams.title as string;
   try {
     const entry = await searchGame(title);
     const game1 = await getGameDetail(title);
@@ -75,7 +74,7 @@ export default async function Page({
                 <Col>
                   <Typography style={{}}>
                     <Title level={2}>{entry.name}</Title>
-                    <div style={{marginBottom: '15px'}}>
+                    <div style={{ marginBottom: "15px" }}>
                       {game1.platforms?.map((e) => (
                         <Tag color={e.color}>{e.name}</Tag>
                       ))}
