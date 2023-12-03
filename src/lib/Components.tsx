@@ -8,10 +8,8 @@ import { useRouter } from "next/navigation";
 
 export function SearchBar() {
   function onChange(value: string) {
-    if (value !== '') {
       setKW(value);
       setLoading(true);
-    }
   }
 
   const [kw, setKW] = useState("");
@@ -19,7 +17,6 @@ export function SearchBar() {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    if (kw !== "") {
       fetch("/api/game/search", {
         method: "POST",
         body: JSON.stringify({ content: kw }),
@@ -31,7 +28,6 @@ export function SearchBar() {
           setLoading(false);
         })
         .catch((e) => console.error(e));
-    }
   }, [kw]);
 
   return (
@@ -64,7 +60,7 @@ export function DropList({ data }: any) {
       <Flex
         style={{
           overflow: "scroll",
-          height: "30vh",
+          height: "50vh",
           width: "100%",
         }}
       >

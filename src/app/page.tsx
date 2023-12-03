@@ -1,19 +1,42 @@
 "use server";
 
 import { Card, Col, Flex, Image, Row, Typography } from "antd";
-import React from "react";
+import React, { FC } from 'react'
 import Meta from "antd/es/card/Meta";
 import { Game } from "@/interfaces/game_interfaces";
 import { notion } from "@/lib/Notion";
 import { PageObjectResponse } from "@notionhq/client/build/src/api-endpoints";
 import Title from "antd/lib/typography/Title";
 import Link from "next/link";
+import { HowLongToBeatService } from 'howlongtobeat'
 
 const tagList = [
   "New Games",
   "The Legend of Zelda Collection",
   "Best Mario Games",
 ];
+
+const howLongToBeatService = new HowLongToBeatService()
+
+function GameRow({ cardWidth, title, getGames } : {cardWidth: string, title: string, getGames: any}) {
+  return (
+    <>
+      <Typography>
+        <Title level={2}>{title}</Title>
+      </Typography>
+      <Row
+        wrap={false}
+        justify="start"
+        style={{
+          width: "90vw",
+          overflow: "auto",
+        }}
+      >
+        <GameCards props={{ tag: title, cardWidth: cardWidth, getGames: getGames }} />
+      </Row>
+    </>
+  );
+}
 
 export default async function Home() {
   return (
@@ -24,34 +47,21 @@ export default async function Home() {
         justify={"space-between"}
         style={{ marginTop: 20, marginLeft: 20, marginRight: 0 }}
       >
+        <GameRow cardWidth="200px" title={'Popular Games'} getGames={async() => {
+          const a = await howLongToBeatService.search('')
+          return a.map((e) => ({ coverUrl: e.imageUrl, name: e.name } as Game))
+        }}/>
         {tagList.map((e, i) => {
-          return (
-            <>
-              <Typography>
-                <Title level={2}>{e}</Title>
-              </Typography>
-              <Row
-                wrap={false}
-                justify="start"
-                style={{
-                  width: "90vw",
-                  overflow: "auto",
-                }}
-              >
-                <GameCards props={{ tag: e }} />
-              </Row>
-            </>
-          );
+          return <GameRow cardWidth="400px" key={i} title={e} getGames={async () => await getGamesByTag(e)}/>
         })}
       </Flex>
     </main>
   );
 }
 
-const cardWidth = "400px";
-
 export async function GameCards({ props }: { props: any }) {
-  const games: Array<Game> = await getGamesByTag(props.tag);
+  const games: Array<Game> = await props.getGames();
+  const cardWidth = props.cardWidth
 
   return games.map((game, i) => {
     return (
