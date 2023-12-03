@@ -122,8 +122,6 @@ async function getGamesByTag(tag: string): Promise<Array<Game>> {
   });
   const results = result.results;
 
-  console.log(results);
-
   return results
     .filter((e) => e.object == "page")
     .map((e) => e as PageObjectResponse)

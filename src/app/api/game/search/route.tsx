@@ -6,5 +6,5 @@ const howLongToBeatService = new HowLongToBeatService()
 export async function POST(request : Request) {
   const data : ReqData = await request.json()
   const entries = await howLongToBeatService.search(data.content)
-  return NextResponse.json(entries[0])
+  return NextResponse.json(entries)
 }
