@@ -2,22 +2,12 @@
 
 import Title from "antd/lib/typography/Title";
 import { HowLongToBeatEntry, HowLongToBeatService } from "howlongtobeat";
-import {
-  Card,
-  Col,
-  Flex,
-  Image,
-  Row,
-  Slider,
-  Statistic,
-  Tag,
-  Typography,
-} from "antd";
+import { Card, Col, Flex, Image, Row, Statistic, Tag, Typography } from "antd";
 import { Game } from "@/interfaces/game_interfaces";
 import Paragraph from "antd/es/typography/Paragraph";
-import { Fragment, ReactNode } from "react";
-import { SliderMarks } from "antd/es/slider";
+import { ReactNode } from "react";
 import { PersonalizeCard } from "@/lib/components/PersonalizeCard";
+import { cookies } from "next/headers";
 
 const hLTBService = new HowLongToBeatService();
 
@@ -45,6 +35,17 @@ export default async function Page({
 }) {
   const title = decodeURIComponent(params.slug);
 
+  let timeData = null;
+  const cookie = cookies().get("time-data")?.value;
+  if (cookie) {
+    try {
+      timeData = JSON.parse(cookie) as number[];
+      console.log(timeData);
+    } catch (e) {
+      console.error("Error occurred when reading cookies. Error: " + e);
+    }
+  }
+
   try {
     const entry = await searchGame(title);
     const detail = await getGameDetail(title);
@@ -61,7 +62,10 @@ export default async function Page({
               <GameInfo entry={entry} detail={detail} />
             </ContentCard>
             <ContentCard>
-              <PersonalizeCard entry={JSON.parse(JSON.stringify(entry))} />
+              <PersonalizeCard
+                entry={JSON.parse(JSON.stringify(entry))}
+                timeData={timeData}
+              />
             </ContentCard>
           </Flex>
         </main>
@@ -102,7 +106,6 @@ async function getGameDetail(title: string) {
 
     const obj: { id: number; platforms: number[]; summary: string }[] =
       await result.json();
-    console.log(obj);
 
     if (!obj || obj.length == 0) {
       throw new Error(

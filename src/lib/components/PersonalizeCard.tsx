@@ -1,12 +1,10 @@
 "use client";
 
-import { Card, Col, Flex, Row, Slider, Space } from "antd";
-import { Fragment, useState } from "react";
+import { Card, Col, Flex, Row, Slider } from "antd";
+import { Fragment, useEffect, useState } from "react";
 import Title from "antd/lib/typography/Title";
 import { SliderMarks } from "antd/es/slider";
-import { HowLongToBeatEntry } from "howlongtobeat";
-import { Game } from "@/interfaces/game_interfaces";
-import Paragraph from "antd/es/typography/Paragraph";
+import { getCookie, setCookie } from "cookies-next";
 
 const DAYS = [
   "Monday",
@@ -24,10 +22,23 @@ const timeMarks: SliderMarks = {
   24: "24h",
 };
 
-export function PersonalizeCard({ entry }: { entry: object }) {
+const cookieKey = 'time-data';
+
+export function PersonalizeCard({
+  entry,
+  timeData,
+}: {
+  entry: object;
+  timeData: number[] | null;
+}) {
   const [timeArray, setTA] = useState(
-    Array.from({ length: DAYS.length }).fill(0) as number[],
+    timeData ?? Array.from({ length: DAYS.length }).fill(0) as number[]
   );
+
+  useEffect(() => {
+    setCookie(cookieKey, JSON.stringify(timeArray));
+    console.log("Cookie set: " + getCookie(cookieKey));
+  }, [timeArray]);
 
   return (
     <Row>
@@ -36,7 +47,7 @@ export function PersonalizeCard({ entry }: { entry: object }) {
           <Flex gap={"middle"} vertical justify={"flex-start"} align={"start"}>
             {DAYS.map((label, idx) => {
               return (
-                <Fragment>
+                <Fragment key={idx}>
                   <Flex
                     gap={5}
                     vertical
