@@ -13,6 +13,8 @@ import Statistic from "antd/lib/statistic/Statistic";
 import { Formatter } from "antd/lib/statistic/utils";
 import { TimeStat } from "@/lib/components/TimeStat";
 
+import leven from 'fast-levenshtein'
+
 const hLTBService = new HowLongToBeatService();
 
 const platformDict: Record<number, { name: string; color: string }> = {
@@ -104,11 +106,11 @@ async function getGameDetail(title: string) {
     const result = await fetch("https://api.igdb.com/v4/games", {
       method: "POST",
       headers: myHeaders,
-      body: 'search "' + title + '"; fields platforms, summary; limit 1;',
+      body: 'search "' + title + '"; fields name, platforms, summary; limit 10;',
       cache: 'force-cache'
     });
 
-    const obj: { id: number; platforms: number[]; summary: string }[] =
+    const obj: { name: string, id: number; platforms: number[]; summary: string }[] =
       await result.json();
 
     if (!obj || obj.length == 0) {
@@ -116,6 +118,13 @@ async function getGameDetail(title: string) {
         "No entry returned. title: " + title + " result: " + result,
       );
     }
+
+    obj.sort((a, b) => {
+      const n1 = leven.get(title, a.name)
+      const n2 = leven.get(title, b.name)
+
+      return n1 == n2 ? 0 : n1 < n2 ? -1 : 1
+    })
 
     const game = obj[0];
     return {
