@@ -2,13 +2,14 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import StyledComponentsRegistry from "@/lib/AntdRegistry";
-import { Button, ConfigProvider, Layout, Menu } from "antd";
+import { Button, ConfigProvider, Flex, Layout, Menu } from 'antd'
 import theme from "@/theme/themeConfig";
 import React from "react";
 import { Content, Header } from "antd/es/layout/layout";
 import Link from "next/link";
 import Search from 'antd/es/input/Search'
 import { SearchBar } from '@/lib/Components'
+import { SearchOutlined } from '@ant-design/icons'
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -43,12 +44,14 @@ export default function RootLayout({
                   boxShadow: "0px .5px 7px gray",
                 }}
               >
-                <Link href={"/"}>
-                  <h1 className="text-xl font-bold tracking-tight text-violet-400 mr-10">
-                    PlayPredict
-                  </h1>
-                </Link>
-                <SearchBar/>
+                <Flex gap={'middle'} justify={'flex-start'} align={'center'}>
+                  <Link href={"/"}>
+                    <h1 className="text-3xl font-bold tracking-tight text-violet-400 mr-5">
+                      PlayPredict
+                    </h1>
+                  </Link>
+                  <SearchBar/>
+                </Flex>
               </Header>
               <Content
                 style={{
