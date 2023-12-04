@@ -1,16 +1,24 @@
 "use server";
 
-import { redirect } from "next/navigation";
 import Title from "antd/lib/typography/Title";
-import { HowLongToBeatService } from "howlongtobeat";
-import { Card, Col, Flex, Image, Row, Statistic, Tag, Typography } from "antd";
+import { HowLongToBeatEntry, HowLongToBeatService } from "howlongtobeat";
+import {
+  Card,
+  Col,
+  Flex,
+  Image,
+  Row,
+  Slider,
+  Statistic,
+  Tag,
+  Typography,
+} from "antd";
 import { Game } from "@/interfaces/game_interfaces";
 import Paragraph from "antd/es/typography/Paragraph";
+import { Fragment, ReactNode, useState } from 'react'
+import { SliderMarks } from 'antd/es/slider'
 
 const hLTBService = new HowLongToBeatService();
-
-const prefix =
-  "https://api.mobygames.com/v1/games?api_key=" + process.env.MOBY_KEY;
 
 const platformDict: Record<number, { name: string; color: string }> = {
   130: { name: "Nintendo Switch", color: "red" },
@@ -27,6 +35,22 @@ const platformDict: Record<number, { name: string; color: string }> = {
   37: { name: "3DS", color: "geekblue" },
 };
 
+const DAYS = [
+  "Monday",
+  "Tuesday",
+  "Wednesday",
+  "Thursday",
+  "Friday",
+  "Saturday",
+  "Sunday",
+];
+
+const timeMarks : SliderMarks = {
+  0: '0h',
+  12: '12h',
+  24: '24h'
+}
+
 export default async function Page({
   params,
   searchParams,
@@ -38,69 +62,40 @@ export default async function Page({
 
   try {
     const entry = await searchGame(title);
-    const game1 = await getGameDetail(title);
+    const detail = await getGameDetail(title);
 
     return (
       <>
         <main className="w-full">
-          <Flex vertical style={{ alignItems: "center", height: "100vh" }}>
-            <Card
-              style={{
-                marginLeft: "-1vw",
-                marginRight: "4vw",
-                width: "80vw",
-              }}
-            >
-              <Row
-                wrap={false}
-                justify={"start"}
-                gutter={10}
-                style={{ width: "100%" }}
-              >
-                <Col
-                  span={8}
-                  style={{ marginLeft: "-30px", marginTop: "-30px" }}
-                >
-                  <Image
-                    src={entry.imageUrl}
-                    preview={false}
-                    width="20vw"
-                    style={{
-                      borderRadius: "10px",
-                      boxShadow: "5px 5px 10px gray",
-                    }}
-                  />
-                </Col>
-                <Col>
-                  <Typography style={{}}>
-                    <Title level={2}>{entry.name}</Title>
-                    <div style={{ marginBottom: "15px" }}>
-                      {game1.platforms?.map((e) => (
-                        <Tag color={e.color}>{e.name}</Tag>
-                      ))}
-                    </div>
-                    <Paragraph>{game1.description}</Paragraph>
-                  </Typography>
-                  <Flex gap={30} style={{ alignItems: "center" }}>
-                    <Statistic
-                      title={"Main Story"}
-                      value={entry.gameplayMain}
-                      suffix={"Hours"}
-                    />
-                    <Statistic
-                      title={"Main+Extra"}
-                      value={entry.gameplayMainExtra}
-                      suffix={"Hours"}
-                    />
-                    <Statistic
-                      title={"Completion"}
-                      value={entry.gameplayCompletionist}
-                      suffix={"Hours"}
-                    />
-                  </Flex>
-                </Col>
-              </Row>
-            </Card>
+          <Flex
+            vertical
+            gap={"large"}
+            style={{ alignItems: "center", height: "100%" }}
+          >
+            <ContentCard>
+              <GameInfo entry={entry} detail={detail} />
+            </ContentCard>
+            <ContentCard>
+              <Flex gap={'middle'} vertical justify={'flex-start'} align={'start'}>
+                {DAYS.map((label, idx) => {
+                  return (
+                    <Fragment>
+                      <Flex gap={5} vertical justify={'flex-start'} align={'start'} style={{width: '100%'}}>
+                        <Title level={5}>{label}</Title>
+                        <Slider
+                          min={0}
+                          max={24}
+                          step={0.5}
+                          defaultValue={0}
+                          style={{ width: "50%" }}
+                          marks={timeMarks}
+                        />
+                      </Flex>
+                    </Fragment>
+                  );
+                })}
+              </Flex>
+            </ContentCard>
           </Flex>
         </main>
       </>
@@ -114,6 +109,7 @@ export default async function Page({
     );
   }
 }
+
 async function searchGame(title: string) {
   const entries = await hLTBService.search(title);
   if (entries.length < 1) {
@@ -123,6 +119,7 @@ async function searchGame(title: string) {
   }
   return entries[0];
 }
+
 async function getGameDetail(title: string) {
   try {
     const myHeaders = new Headers();
@@ -153,10 +150,74 @@ async function getGameDetail(title: string) {
       platforms: game.platforms
         ?.filter((e) => platformDict[e])
         .map((e) => platformDict[e]),
-    };
+    } as Game;
   } catch (e) {
     console.error(e);
   }
 
   return {} as Game;
+}
+
+function ContentCard({ children }: { children: ReactNode }) {
+  return (
+    <Card
+      style={{
+        marginLeft: "-1vw",
+        marginRight: "4vw",
+        width: "80vw",
+      }}
+    >
+      {children}
+    </Card>
+  );
+}
+
+function GameInfo({
+  entry,
+  detail,
+}: {
+  entry: HowLongToBeatEntry;
+  detail: Game;
+}) {
+  return (
+    <Row wrap={false} justify={"start"} gutter={10} style={{ width: "100%" }}>
+      <Col span={8} style={{ marginLeft: "-30px", marginTop: "-30px" }}>
+        <Image
+          src={entry.imageUrl}
+          preview={false}
+          width="20vw"
+          style={{
+            borderRadius: "10px",
+            boxShadow: "5px 5px 10px gray",
+          }}
+        />
+      </Col>
+      <Col>
+        <Typography style={{}}>
+          <Title level={2}>{entry.name}</Title>
+          <div style={{ marginBottom: "15px" }}>
+            {detail.platforms?.map((e) => <Tag color={e.color}>{e.name}</Tag>)}
+          </div>
+          <Paragraph>{detail.description}</Paragraph>
+        </Typography>
+        <Flex gap={30} style={{ alignItems: "center" }}>
+          <Statistic
+            title={"Main Story"}
+            value={entry.gameplayMain}
+            suffix={"Hours"}
+          />
+          <Statistic
+            title={"Main+Extra"}
+            value={entry.gameplayMainExtra}
+            suffix={"Hours"}
+          />
+          <Statistic
+            title={"Completion"}
+            value={entry.gameplayCompletionist}
+            suffix={"Hours"}
+          />
+        </Flex>
+      </Col>
+    </Row>
+  );
 }
