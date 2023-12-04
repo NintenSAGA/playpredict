@@ -106,25 +106,34 @@ async function getGameDetail(title: string) {
     const result = await fetch("https://api.igdb.com/v4/games", {
       method: "POST",
       headers: myHeaders,
-      body: 'search "' + title + '"; fields name, platforms, summary; limit 10;',
+      body: 'search "' + title + '"; fields rating, name, platforms, summary; limit 10;',
       cache: 'force-cache'
     });
 
-    const obj: { name: string, id: number; platforms: number[]; summary: string }[] =
+    const raw: { name: string, id: number, platforms: number[], summary: string, rating?: number }[] =
       await result.json();
 
-    if (!obj || obj.length == 0) {
+    if (!raw || raw.length == 0) {
       throw new Error(
         "No entry returned. title: " + title + " result: " + result,
       );
     }
 
-    obj.sort((a, b) => {
+    const obj = raw
+    .toSorted((a, b) => {
+      const n1 = a.rating == undefined ? 1 : 0
+      const n2 = b.rating == undefined ? 1 : 0
+
+      return n1 == n2 ? 0 : n1 < n2 ? -1 : 1
+    })
+    .toSorted((a, b) => {
       const n1 = leven.get(title, a.name)
       const n2 = leven.get(title, b.name)
 
       return n1 == n2 ? 0 : n1 < n2 ? -1 : 1
     })
+
+    console.log(obj)
 
     const game = obj[0];
     return {

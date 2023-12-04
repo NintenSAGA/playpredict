@@ -79,7 +79,7 @@ export function DropList({ data }: any) {
           style={{ width: "100%" }}
           renderItem={(item: HowLongToBeatEntry) => {
             return (
-              <a href={"/game/" + encodeURI(item.name)}>
+              <a href={"/game/" + encodeURIComponent(item.name)}>
                 <Card
                   hoverable
                   style={{
