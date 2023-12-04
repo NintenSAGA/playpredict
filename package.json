@@ -13,6 +13,7 @@
     "@notionhq/client": "^2.2.13",
     "antd": "^5.11.5",
     "cookies-next": "^4.1.0",
+    "edit-distance": "^1.0.5",
     "howlongtobeat": "^1.8.0",
     "next": "14.0.3",
     "prettier": "^3.1.0",

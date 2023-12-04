@@ -97,7 +97,7 @@ export async function GameCards({ props }: { props: any }) {
           marginLeft: "10px",
         }}
       >
-        <Link href={"/game/" + encodeURI(game.name)}>
+        <Link href={"/game/" + encodeURI(game.name) + '#top'}>
           <Card
             hoverable
             style={{ width: cardWidth }}
