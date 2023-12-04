@@ -26,6 +26,7 @@ export function SearchBar() {
     fetch("/api/game/search", {
       method: "POST",
       body: JSON.stringify({ content: kw }),
+      cache: 'force-cache'
     })
       .then((r) => r.json())
       .then((r) => r as HowLongToBeatEntry[])

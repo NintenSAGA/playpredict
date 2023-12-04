@@ -105,6 +105,7 @@ async function getGameDetail(title: string) {
       method: "POST",
       headers: myHeaders,
       body: 'search "' + title + '"; fields platforms, summary; limit 1;',
+      cache: 'force-cache'
     });
 
     const obj: { id: number; platforms: number[]; summary: string }[] =

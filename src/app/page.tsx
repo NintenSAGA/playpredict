@@ -1,14 +1,14 @@
 "use server";
 
 import { Card, Col, Flex, Image, Row, Typography } from "antd";
-import React, { FC } from 'react'
+import React, { cache } from "react";
 import Meta from "antd/es/card/Meta";
 import { Game } from "@/interfaces/game_interfaces";
 import { notion } from "@/lib/Notion";
 import { PageObjectResponse } from "@notionhq/client/build/src/api-endpoints";
 import Title from "antd/lib/typography/Title";
 import Link from "next/link";
-import { HowLongToBeatService } from 'howlongtobeat'
+import { HowLongToBeatService } from "howlongtobeat";
 
 const tagList = [
   "New Games",
@@ -16,9 +16,17 @@ const tagList = [
   "Best Mario Games",
 ];
 
-const howLongToBeatService = new HowLongToBeatService()
+const howLongToBeatService = new HowLongToBeatService();
 
-function GameRow({ cardWidth, title, getGames } : {cardWidth: string, title: string, getGames: any}) {
+function GameRow({
+  cardWidth,
+  title,
+  getGames,
+}: {
+  cardWidth: string;
+  title: string;
+  getGames: any;
+}) {
   return (
     <>
       <Typography>
@@ -32,7 +40,9 @@ function GameRow({ cardWidth, title, getGames } : {cardWidth: string, title: str
           overflow: "auto",
         }}
       >
-        <GameCards props={{ tag: title, cardWidth: cardWidth, getGames: getGames }} />
+        <GameCards
+          props={{ tag: title, cardWidth: cardWidth, getGames: getGames }}
+        />
       </Row>
     </>
   );
@@ -47,12 +57,25 @@ export default async function Home() {
         justify={"space-between"}
         style={{ marginTop: 20, marginLeft: 20, marginRight: 0 }}
       >
-        <GameRow cardWidth="200px" title={'Popular Games'} getGames={async() => {
-          const a = await howLongToBeatService.search('')
-          return a.map((e) => ({ coverUrl: e.imageUrl, name: e.name } as Game))
-        }}/>
+        <GameRow
+          cardWidth="200px"
+          title={"Popular Games"}
+          getGames={async () => {
+            const a = await howLongToBeatService.search("");
+            return a.map(
+              (e) => ({ coverUrl: e.imageUrl, name: e.name }) as Game,
+            );
+          }}
+        />
         {tagList.map((e, i) => {
-          return <GameRow cardWidth="400px" key={i} title={e} getGames={async () => await getGamesByTag(e)}/>
+          return (
+            <GameRow
+              cardWidth="400px"
+              key={i}
+              title={e}
+              getGames={async () => await getCachedGamesByTag(e)}
+            />
+          );
         })}
       </Flex>
     </main>
@@ -61,7 +84,7 @@ export default async function Home() {
 
 export async function GameCards({ props }: { props: any }) {
   const games: Array<Game> = await props.getGames();
-  const cardWidth = props.cardWidth
+  const cardWidth = props.cardWidth;
 
   return games.map((game, i) => {
     return (
@@ -120,6 +143,8 @@ export async function GameCards({ props }: { props: any }) {
     );
   });
 }
+
+const getCachedGamesByTag = cache(getGamesByTag);
 
 async function getGamesByTag(tag: string): Promise<Array<Game>> {
   const result = await notion.databases.query({
