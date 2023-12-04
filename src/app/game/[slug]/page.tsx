@@ -15,8 +15,9 @@ import {
 } from "antd";
 import { Game } from "@/interfaces/game_interfaces";
 import Paragraph from "antd/es/typography/Paragraph";
-import { Fragment, ReactNode, useState } from 'react'
-import { SliderMarks } from 'antd/es/slider'
+import { Fragment, ReactNode } from "react";
+import { SliderMarks } from "antd/es/slider";
+import { PersonalizeCard } from "@/lib/components/PersonalizeCard";
 
 const hLTBService = new HowLongToBeatService();
 
@@ -34,22 +35,6 @@ const platformDict: Record<number, { name: string; color: string }> = {
   20: { name: "NDS", color: "gold" },
   37: { name: "3DS", color: "geekblue" },
 };
-
-const DAYS = [
-  "Monday",
-  "Tuesday",
-  "Wednesday",
-  "Thursday",
-  "Friday",
-  "Saturday",
-  "Sunday",
-];
-
-const timeMarks : SliderMarks = {
-  0: '0h',
-  12: '12h',
-  24: '24h'
-}
 
 export default async function Page({
   params,
@@ -76,25 +61,7 @@ export default async function Page({
               <GameInfo entry={entry} detail={detail} />
             </ContentCard>
             <ContentCard>
-              <Flex gap={'middle'} vertical justify={'flex-start'} align={'start'}>
-                {DAYS.map((label, idx) => {
-                  return (
-                    <Fragment>
-                      <Flex gap={5} vertical justify={'flex-start'} align={'start'} style={{width: '100%'}}>
-                        <Title level={5}>{label}</Title>
-                        <Slider
-                          min={0}
-                          max={24}
-                          step={0.5}
-                          defaultValue={0}
-                          style={{ width: "50%" }}
-                          marks={timeMarks}
-                        />
-                      </Flex>
-                    </Fragment>
-                  );
-                })}
-              </Flex>
+              <PersonalizeCard entry={JSON.parse(JSON.stringify(entry))} />
             </ContentCard>
           </Flex>
         </main>
