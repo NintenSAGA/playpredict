@@ -5,7 +5,7 @@ export default function Loading() {
     <>
       <main className="w-full">
         <Flex vertical justify={'center'} style={{ alignItems: "center", height: "100vh" }}>
-          <Spin tip="Loading" size="large">
+          <Spin size="large">
           </Spin>
         </Flex>
       </main>

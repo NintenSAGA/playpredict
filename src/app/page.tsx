@@ -66,6 +66,7 @@ export async function GameCards({ props }: { props: any }) {
   return games.map((game, i) => {
     return (
       <Col
+        key={i}
         style={{
           marginBottom: "20px",
           width: cardWidth,

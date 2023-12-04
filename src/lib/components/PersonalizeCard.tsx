@@ -37,7 +37,6 @@ export function PersonalizeCard({
 
   useEffect(() => {
     setCookie(cookieKey, JSON.stringify(timeArray));
-    console.log("Cookie set: " + getCookie(cookieKey));
   }, [timeArray]);
 
   return (

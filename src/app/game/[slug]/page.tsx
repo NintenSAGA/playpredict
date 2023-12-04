@@ -2,12 +2,16 @@
 
 import Title from "antd/lib/typography/Title";
 import { HowLongToBeatEntry, HowLongToBeatService } from "howlongtobeat";
-import { Card, Col, Flex, Image, Row, Statistic, Tag, Typography } from "antd";
+import { Card, Col, Flex, Image, Row, Tag, Typography } from "antd";
 import { Game } from "@/interfaces/game_interfaces";
 import Paragraph from "antd/es/typography/Paragraph";
 import { ReactNode } from "react";
 import { PersonalizeCard } from "@/lib/components/PersonalizeCard";
 import { cookies } from "next/headers";
+import CountUp from "react-countup";
+import Statistic from "antd/lib/statistic/Statistic";
+import { Formatter } from "antd/lib/statistic/utils";
+import { TimeStat } from "@/lib/components/TimeStat";
 
 const hLTBService = new HowLongToBeatService();
 
@@ -40,7 +44,6 @@ export default async function Page({
   if (cookie) {
     try {
       timeData = JSON.parse(cookie) as number[];
-      console.log(timeData);
     } catch (e) {
       console.error("Error occurred when reading cookies. Error: " + e);
     }
@@ -166,26 +169,23 @@ function GameInfo({
         <Typography style={{}}>
           <Title level={2}>{entry.name}</Title>
           <div style={{ marginBottom: "15px" }}>
-            {detail.platforms?.map((e) => <Tag color={e.color}>{e.name}</Tag>)}
+            {detail.platforms?.map((e) => <Tag key={e.name} color={e.color}>{e.name}</Tag>)}
           </div>
           <Paragraph>{detail.description}</Paragraph>
         </Typography>
         <Flex gap={30} style={{ alignItems: "center" }}>
-          <Statistic
-            title={"Main Story"}
-            value={entry.gameplayMain}
-            suffix={"Hours"}
-          />
-          <Statistic
-            title={"Main+Extra"}
-            value={entry.gameplayMainExtra}
-            suffix={"Hours"}
-          />
-          <Statistic
-            title={"Completion"}
-            value={entry.gameplayCompletionist}
-            suffix={"Hours"}
-          />
+          {[
+            { title: "Main Story", value: entry.gameplayMain },
+            { title: "Main+Extra", value: entry.gameplayMainExtra },
+            { title: "Completion", value: entry.gameplayCompletionist },
+          ].map((e) => (
+            <TimeStat
+              key={e.title}
+              title={e.title}
+              value={e.value}
+              suffix={"Hours"}
+            />
+          ))}
         </Flex>
       </Col>
     </Row>
