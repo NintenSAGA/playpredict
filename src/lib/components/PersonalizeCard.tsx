@@ -27,7 +27,7 @@ const timeDataKey = "time-data";
 
 const emptyArray = () => Array.from({ length: DAYS.length }).fill(0) as number[];
 
-export function PersonalizeCard({
+export default function PersonalizeCard({
   entry,
 }: {
   entry: {
@@ -119,7 +119,7 @@ export function PersonalizeCard({
                             setTAs(clone);
                             setCookie(timeDataKey, JSON.stringify({ ...timeData, timeArrays: clone }));
                           }}
-                          style={{ width: "100%" }}
+                          // style={{ width: "100%" }}
                           marks={timeMarks}
                         />
                       </Col>

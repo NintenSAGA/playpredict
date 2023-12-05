@@ -6,7 +6,6 @@ import { Card, Col, Flex, Image, Row, Tag, Typography } from "antd";
 import { Game } from "@/interfaces/game_interfaces";
 import Paragraph from "antd/es/typography/Paragraph";
 import { ReactNode } from "react";
-import { PersonalizeCard } from "@/lib/components/PersonalizeCard";
 import { cookies } from "next/headers";
 import CountUp from "react-countup";
 import Statistic from "antd/lib/statistic/Statistic";
@@ -14,8 +13,11 @@ import { Formatter } from "antd/lib/statistic/utils";
 import { TimeStat } from "@/lib/components/TimeStat";
 
 import leven from 'fast-levenshtein'
+import dynamic from 'next/dynamic'
 
 const hLTBService = new HowLongToBeatService();
+
+const PersonalizeCard = dynamic(() => import("@/lib/components/PersonalizeCard"), {ssr: false})
 
 const platformDict: Record<number, { name: string; color: string }> = {
   130: { name: "Nintendo Switch", color: "red" },
