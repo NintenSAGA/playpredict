@@ -91,7 +91,6 @@ export default function PersonalizeCard({
   if (rawTimeData !== undefined) {
     try {
       let parsed = JSON.parse(rawTimeData) as TimeData;
-      console.log(JSON.stringify(parsed));
       if (
         parsed != null &&
         parsed.timeType != undefined &&
@@ -111,7 +110,8 @@ export default function PersonalizeCard({
   const [timeType, setTT] = useState(initTimeType);
 
   const calcResult = calculate(
-    timeArrays[timeType],
+    timeType,
+    timeArrays,
     entry.gameplayMain,
     new Date(),
     0,
@@ -182,18 +182,23 @@ function HalfContentCard(props: { children?: React.ReactNode }) {
   );
 }
 
-function TimeSlider(
-  {label, timeType, timeArrays, idx, setTAs, timeData, sliderConfig}
-  : {
+function TimeSlider({
+  label,
+  timeType,
+  timeArrays,
+  idx,
+  setTAs,
+  timeData,
+  sliderConfig,
+}: {
   label: string;
   idx: number;
   timeType: number;
   timeArrays: number[][];
   setTAs: Dispatch<SetStateAction<number[][]>>;
   timeData: TimeData;
-  sliderConfig: SliderConfig
+  sliderConfig: SliderConfig;
 }) {
-
   return (
     <Flex
       vertical
@@ -244,14 +249,16 @@ function TimeSlider(
 }
 
 function calculate(
-
-  timeArray: number[],
+  timeType: number,
+  timeArrays: number[][],
   totalHour: number,
   beginDate: Date,
   hoursPlayed: number,
 ): CalcResult {
+
+  const curArray = timeArrays[timeType];
   let allZero = true;
-  for (let time of timeArray) {
+  for (let time of curArray) {
     if (time != 0) {
       allZero = false;
       break;
@@ -259,6 +266,22 @@ function calculate(
   }
   if (allZero) {
     return {} as CalcResult;
+  }
+
+  let timeArray = emptyArray();
+  switch (timeType) {
+    case 0:
+      timeArray = curArray;
+      break;
+    case 1:
+      [0, 6].forEach((i) => timeArray[i] = curArray[1]);
+      for (let i = 1; i < 6; ++i) {
+        timeArray[i] = curArray[0];
+      }
+      break;
+    case 2:
+      timeArray[(6 + beginDate.getDay()) % 7] = curArray[0];
+      break;
   }
 
   let today = beginDate;
