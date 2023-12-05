@@ -57,6 +57,7 @@ export default function RootLayout({
                 style={{
                   height: "100%",
                   marginTop: "10vh",
+                  marginBottom: "10vh",
                   width: "100vw",
                   paddingLeft: "5vw",
                 }}

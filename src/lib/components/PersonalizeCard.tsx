@@ -29,11 +29,19 @@ export function PersonalizeCard({
   timeData,
 }: {
   entry: object;
-  timeData: number[] | null;
+  timeData: string | null;
 }) {
-  const [timeArray, setTA] = useState(
-    timeData ?? Array.from({ length: DAYS.length }).fill(0) as number[]
-  );
+
+  let pTimeData = Array.from({ length: DAYS.length }).fill(0) as number[]
+  if (timeData != null) {
+    try {
+      pTimeData = JSON.parse(timeData) as number[];
+    } catch (e) {
+      console.error("Error occurred when reading cookies. Error: " + e);
+    }
+  }
+
+  const [timeArray, setTA] = useState(pTimeData);
 
   useEffect(() => {
     setCookie(cookieKey, JSON.stringify(timeArray));
@@ -98,4 +106,8 @@ export function PersonalizeCard({
       </Col>
     </Row>
   );
+}
+
+function calculate() {
+
 }

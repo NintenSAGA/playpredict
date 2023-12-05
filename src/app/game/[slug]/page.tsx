@@ -41,15 +41,7 @@ export default async function Page({
 }) {
   const title = decodeURIComponent(params.slug);
 
-  let timeData = null;
-  const cookie = cookies().get("time-data")?.value;
-  if (cookie) {
-    try {
-      timeData = JSON.parse(cookie) as number[];
-    } catch (e) {
-      console.error("Error occurred when reading cookies. Error: " + e);
-    }
-  }
+  const tdCookie = cookies().get("time-data")?.value ?? null;
 
   try {
     const entry = await searchGame(title);
@@ -69,7 +61,7 @@ export default async function Page({
             <ContentCard>
               <PersonalizeCard
                 entry={JSON.parse(JSON.stringify(entry))}
-                timeData={timeData}
+                timeData={tdCookie}
               />
             </ContentCard>
           </Flex>
