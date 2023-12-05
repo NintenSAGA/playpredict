@@ -41,8 +41,6 @@ export default async function Page({
 }) {
   const title = decodeURIComponent(params.slug);
 
-  const tdCookie = cookies().get("time-data")?.value ?? null;
-
   try {
     const entry = await searchGame(title);
     const detail = await getGameDetail(title);
@@ -61,7 +59,6 @@ export default async function Page({
             <ContentCard>
               <PersonalizeCard
                 entry={JSON.parse(JSON.stringify(entry))}
-                timeData={tdCookie}
               />
             </ContentCard>
           </Flex>
@@ -124,8 +121,6 @@ async function getGameDetail(title: string) {
 
       return n1 == n2 ? 0 : n1 < n2 ? -1 : 1
     })
-
-    console.log(obj)
 
     const game = obj[0];
     return {

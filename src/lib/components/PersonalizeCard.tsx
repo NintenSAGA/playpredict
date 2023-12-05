@@ -1,17 +1,11 @@
 "use client";
 
-import { Button, Card, Col, Flex, Row, Slider } from 'antd'
-import {
-  Dispatch,
-  FC,
-  Fragment,
-  SetStateAction,
-  useEffect,
-  useState,
-} from 'react'
+import { Card, Col, Flex, Radio, Row, Slider } from "antd";
+import { Fragment, useEffect, useState } from "react";
 import Title from "antd/lib/typography/Title";
 import { SliderMarks } from "antd/es/slider";
-import { setCookie } from "cookies-next";
+import { getCookie, setCookie } from "cookies-next";
+import { CalcResult, TimeData } from "@/interfaces/personalization_interface";
 
 const DAYS = [
   "Sunday",
@@ -29,45 +23,75 @@ const timeMarks: SliderMarks = {
   24: "24h",
 };
 
-const cookieKey = "time-data";
+const timeDataKey = "time-data";
+
+const emptyArray = () => Array.from({ length: DAYS.length }).fill(0) as number[];
 
 export function PersonalizeCard({
   entry,
-  timeData,
 }: {
   entry: {
     gameplayMain: number;
     gameplayMainExtra: number;
     gameplayCompletionist: number;
   };
-  timeData: string | null;
 }) {
-  let pTimeData = Array.from({ length: DAYS.length }).fill(0) as number[];
-  if (timeData != null) {
+
+  let initTimeArrays: number[][] = Array.from({ length: 3 }).fill([...(emptyArray())]) as number[][];
+  let initTimeType = 0;
+  let timeData: TimeData = {
+    timeType: 0,
+    timeArrays: initTimeArrays,
+  };
+  const rawTimeData = getCookie(timeDataKey);
+  if (rawTimeData !== undefined) {
     try {
-      pTimeData = JSON.parse(timeData) as number[];
+      let parsed = JSON.parse(rawTimeData) as TimeData;
+      console.log(JSON.stringify(parsed));
+      if (
+        parsed != null &&
+        parsed.timeType != undefined &&
+        parsed.timeArrays != undefined &&
+        parsed.timeArrays.length == 3
+      ) {
+        timeData = parsed;
+        initTimeType = parsed.timeType;
+        initTimeArrays = parsed.timeArrays;
+      }
     } catch (e) {
       console.error("Error occurred when reading cookies. Error: " + e);
     }
   }
 
-  const [timeArray, setTA] = useState(pTimeData);
+  const [timeArrays, setTAs] = useState(initTimeArrays);
+  const [timeType, setTT] = useState(initTimeType);
 
-  useEffect(() => {
-    setCookie(cookieKey, JSON.stringify(timeArray));
-  }, [timeArray]);
-
-  const calcResult = calculate(timeArray, entry.gameplayMain, new Date(), 0)
+  const calcResult = calculate(timeArrays[timeType], entry.gameplayMain, new Date(), 0);
 
   return (
     <Row gutter={20}>
       <Col span={12}>
         <HalfContentCard>
           <Flex gap={"middle"} vertical justify={"flex-start"} align={"start"}>
+            <Radio.Group
+              options={[
+                { label: "Daily", value: 0 },
+                { label: "Workday/Weekend", value: 1 },
+                { label: "Weekly", value: 2 },
+              ]}
+              value={timeType}
+              onChange={(e) => {
+                const clone = e.target.value
+                setTT(clone);
+                setCookie(timeDataKey, JSON.stringify({ ...timeData, timeType: clone }));
+              }}
+              optionType="button"
+              buttonStyle="solid"
+            />
             {DAYS.map((label, idx) => {
               return (
-                <Fragment key={idx}>
                   <Flex
+                    key={label}
                     gap={5}
                     vertical
                     justify={"flex-start"}
@@ -88,11 +112,12 @@ export function PersonalizeCard({
                           min={0}
                           max={24}
                           step={0.5}
-                          value={timeArray[idx]}
+                          value={timeArrays[timeType][idx]}
                           onChange={(v) => {
-                            const clone = [...timeArray];
-                            clone[idx] = v;
-                            setTA(clone);
+                            const clone = timeArrays.map((a) => [...a])
+                            clone[timeType][idx] = v;
+                            setTAs(clone);
+                            setCookie(timeDataKey, JSON.stringify({ ...timeData, timeArrays: clone }));
                           }}
                           style={{ width: "100%" }}
                           marks={timeMarks}
@@ -101,7 +126,7 @@ export function PersonalizeCard({
                       <Col span={6}>
                         <Flex gap={8} align={"end"} justify={"end"}>
                           <h1 style={{ fontSize: 23, fontWeight: "bold" }}>
-                            {timeArray[idx] + " "}
+                            {timeArrays[timeType][idx] + " "}
                           </h1>
                           <h2 style={{ fontSize: 20, fontWeight: "lighter" }}>
                             Hours
@@ -110,7 +135,6 @@ export function PersonalizeCard({
                       </Col>
                     </Row>
                   </Flex>
-                </Fragment>
               );
             })}
           </Flex>
@@ -119,14 +143,14 @@ export function PersonalizeCard({
       <Col span={12}>
         <HalfContentCard>
           <div>
-            <h2>
-              You're about to finish this game:
-            </h2>
+            <h2>You're about to finish this game:</h2>
             <ul>
               <li>Start to play: today</li>
               <li>Hours to go: {entry.gameplayMain}</li>
               <li>Days to go: {calcResult.daysToGo}</li>
-              <li>Finish playing on: {calcResult.endDate?.toLocaleDateString()}</li>
+              <li>
+                Finish playing on: {calcResult.endDate?.toLocaleDateString()}
+              </li>
             </ul>
           </div>
         </HalfContentCard>
@@ -148,16 +172,16 @@ function calculate(
   totalHour: number,
   beginDate: Date,
   hoursPlayed: number,
-) : CalcResult {
-  let allZero = true
+): CalcResult {
+  let allZero = true;
   for (let time of timeArray) {
     if (time != 0) {
-      allZero = false
-      break
+      allZero = false;
+      break;
     }
   }
   if (allZero) {
-    return {} as CalcResult
+    return {} as CalcResult;
   }
 
   let today = beginDate;
@@ -176,9 +200,4 @@ function calculate(
     daysToGo: daysToGo,
     endDate: today,
   };
-}
-
-interface CalcResult {
-  daysToGo: number,
-  endDate: Date,
 }
