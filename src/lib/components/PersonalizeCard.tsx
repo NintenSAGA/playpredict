@@ -1,19 +1,26 @@
 "use client";
 
-import { Card, Col, Flex, Row, Slider } from "antd";
-import { Fragment, useEffect, useState } from "react";
+import { Button, Card, Col, Flex, Row, Slider } from 'antd'
+import {
+  Dispatch,
+  FC,
+  Fragment,
+  SetStateAction,
+  useEffect,
+  useState,
+} from 'react'
 import Title from "antd/lib/typography/Title";
 import { SliderMarks } from "antd/es/slider";
-import { getCookie, setCookie } from "cookies-next";
+import { setCookie } from "cookies-next";
 
 const DAYS = [
+  "Sunday",
   "Monday",
   "Tuesday",
   "Wednesday",
   "Thursday",
   "Friday",
   "Saturday",
-  "Sunday",
 ];
 
 const timeMarks: SliderMarks = {
@@ -22,17 +29,20 @@ const timeMarks: SliderMarks = {
   24: "24h",
 };
 
-const cookieKey = 'time-data';
+const cookieKey = "time-data";
 
 export function PersonalizeCard({
   entry,
   timeData,
 }: {
-  entry: object;
+  entry: {
+    gameplayMain: number;
+    gameplayMainExtra: number;
+    gameplayCompletionist: number;
+  };
   timeData: string | null;
 }) {
-
-  let pTimeData = Array.from({ length: DAYS.length }).fill(0) as number[]
+  let pTimeData = Array.from({ length: DAYS.length }).fill(0) as number[];
   if (timeData != null) {
     try {
       pTimeData = JSON.parse(timeData) as number[];
@@ -47,10 +57,12 @@ export function PersonalizeCard({
     setCookie(cookieKey, JSON.stringify(timeArray));
   }, [timeArray]);
 
+  const calcResult = calculate(timeArray, entry.gameplayMain, new Date(), 0)
+
   return (
-    <Row>
+    <Row gutter={20}>
       <Col span={12}>
-        <Card style={{ boxShadow: "5px 5px 10px lightgray" }}>
+        <HalfContentCard>
           <Flex gap={"middle"} vertical justify={"flex-start"} align={"start"}>
             {DAYS.map((label, idx) => {
               return (
@@ -102,12 +114,71 @@ export function PersonalizeCard({
               );
             })}
           </Flex>
-        </Card>
+        </HalfContentCard>
+      </Col>
+      <Col span={12}>
+        <HalfContentCard>
+          <div>
+            <h2>
+              You're about to finish this game:
+            </h2>
+            <ul>
+              <li>Start to play: today</li>
+              <li>Hours to go: {entry.gameplayMain}</li>
+              <li>Days to go: {calcResult.daysToGo}</li>
+              <li>Finish playing on: {calcResult.endDate?.toLocaleDateString()}</li>
+            </ul>
+          </div>
+        </HalfContentCard>
       </Col>
     </Row>
   );
 }
 
-function calculate() {
+function HalfContentCard(props: { children?: React.ReactNode }) {
+  return (
+    <Card style={{ boxShadow: "5px 5px 10px lightgray" }}>
+      {props.children}
+    </Card>
+  );
+}
 
+function calculate(
+  timeArray: number[],
+  totalHour: number,
+  beginDate: Date,
+  hoursPlayed: number,
+) : CalcResult {
+  let allZero = true
+  for (let time of timeArray) {
+    if (time != 0) {
+      allZero = false
+      break
+    }
+  }
+  if (allZero) {
+    return {} as CalcResult
+  }
+
+  let today = beginDate;
+  let daysToGo = 0;
+  for (
+    let sum = hoursPlayed;
+    sum < totalHour;
+    daysToGo++,
+      sum += timeArray[today.getDay()],
+      today.setDate(today.getDate() + 1)
+  ) {}
+
+  today.setDate(today.getDate() - 1);
+
+  return {
+    daysToGo: daysToGo,
+    endDate: today,
+  };
+}
+
+interface CalcResult {
+  daysToGo: number,
+  endDate: Date,
 }
