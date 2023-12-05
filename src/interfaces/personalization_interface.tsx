@@ -14,5 +14,6 @@ export interface SliderConfig {
   labels: string[],
   min: number,
   max: number,
-  sliderMarks: SliderMarks
+  sliderMarks: SliderMarks,
+  step: number
 }

@@ -11,7 +11,11 @@ import React, {
 import Title from "antd/lib/typography/Title";
 import { SliderMarks } from "antd/es/slider";
 import { getCookie, setCookie } from "cookies-next";
-import { CalcResult, TimeData } from "@/interfaces/personalization_interface";
+import {
+  CalcResult,
+  SliderConfig,
+  TimeData,
+} from "@/interfaces/personalization_interface";
 
 const dailyMarks: SliderMarks = {
   0: "0h",
@@ -30,7 +34,7 @@ const weeklyMarks: SliderMarks = {
   168: "7d",
 };
 
-const sliderConfigs: SliderMarks[] = [
+const sliderConfigs: SliderConfig[] = [
   {
     labels: [
       "Sunday",
@@ -43,30 +47,23 @@ const sliderConfigs: SliderMarks[] = [
     ],
     min: 0,
     max: 24,
+    step: 0.5,
     sliderMarks: dailyMarks,
   },
   {
-    labels: ["Workday", "Weekend"],
+    labels: ["Each workday", "Each weekend day"],
     min: 0,
     max: 24,
+    step: 0.5,
     sliderMarks: dailyMarks,
   },
   {
     labels: ["Each week"],
     min: 0,
     max: 168,
+    step: 1,
     sliderMarks: weeklyMarks,
   },
-];
-
-const DAYS = [
-  "Sunday",
-  "Monday",
-  "Tuesday",
-  "Wednesday",
-  "Thursday",
-  "Friday",
-  "Saturday",
 ];
 
 const timeDataKey = "time-data";
@@ -143,19 +140,18 @@ export default function PersonalizeCard({
               optionType="button"
               buttonStyle="solid"
             />
-            {DAYS.map((label, idx) => {
-              return (
-                <TimeSlider
-                  key={label}
-                  label={label}
-                  idx={idx}
-                  timeType={timeType}
-                  timeArrays={timeArrays}
-                  setTAs={setTAs}
-                  timeData={timeData}
-                />
-              );
-            })}
+            {sliderConfigs[timeType].labels.map((label, idx) => (
+              <TimeSlider
+                key={label}
+                label={label}
+                idx={idx}
+                timeType={timeType}
+                timeArrays={timeArrays}
+                setTAs={setTAs}
+                timeData={timeData}
+                sliderConfig={sliderConfigs[timeType]}
+              />
+            ))}
           </Flex>
         </HalfContentCard>
       </Col>
@@ -186,20 +182,17 @@ function HalfContentCard(props: { children?: React.ReactNode }) {
   );
 }
 
-function TimeSlider(props: {
+function TimeSlider(
+  {label, timeType, timeArrays, idx, setTAs, timeData, sliderConfig}
+  : {
   label: string;
   idx: number;
   timeType: number;
   timeArrays: number[][];
   setTAs: Dispatch<SetStateAction<number[][]>>;
   timeData: TimeData;
+  sliderConfig: SliderConfig
 }) {
-  const label = props.label;
-  const timeType = props.timeType;
-  const timeArrays = props.timeArrays;
-  const idx = props.idx;
-  const setTAs = props.setTAs;
-  const timeData = props.timeData;
 
   return (
     <Flex
@@ -220,9 +213,9 @@ function TimeSlider(props: {
       >
         <Col span={18}>
           <Slider
-            min={0}
-            max={24}
-            step={0.5}
+            min={sliderConfig.min}
+            max={sliderConfig.max}
+            step={sliderConfig.step}
             value={timeArrays[timeType][idx]}
             onChange={(v) => {
               const clone = timeArrays.map((a) => [...a]);
@@ -233,8 +226,8 @@ function TimeSlider(props: {
                 JSON.stringify({ ...timeData, timeArrays: clone }),
               );
             }}
-            style={{ width: "100%" }}
-            marks={dailyMarks}
+            style={{ width: "90%" }}
+            marks={sliderConfig.sliderMarks}
           />
         </Col>
         <Col span={6}>
@@ -251,6 +244,7 @@ function TimeSlider(props: {
 }
 
 function calculate(
+
   timeArray: number[],
   totalHour: number,
   beginDate: Date,
