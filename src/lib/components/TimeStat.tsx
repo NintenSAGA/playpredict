@@ -1,4 +1,4 @@
-'use client'
+"use client";
 
 import Statistic from "antd/lib/statistic/Statistic";
 import CountUp from "react-countup";
