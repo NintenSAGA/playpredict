@@ -1,13 +1,16 @@
 "use client";
 
-import { Card, Col, Flex, Radio, Row, Slider } from "antd";
-import React, {
-  Dispatch,
-  Fragment,
-  SetStateAction,
-  useEffect,
-  useState,
-} from "react";
+import {
+  Card,
+  Col,
+  DatePicker,
+  Flex,
+  InputNumber,
+  Radio,
+  Row,
+  Slider,
+} from "antd";
+import React, { Dispatch, SetStateAction, useEffect, useState } from "react";
 import Title from "antd/lib/typography/Title";
 import { SliderMarks } from "antd/es/slider";
 import { getCookie, setCookie } from "cookies-next";
@@ -16,6 +19,7 @@ import {
   SliderConfig,
   TimeData,
 } from "@/interfaces/personalization_interface";
+import dayjs from "dayjs";
 
 const dailyMarks: SliderMarks = {
   0: "0h",
@@ -108,13 +112,16 @@ export default function PersonalizeCard({
 
   const [timeArrays, setTAs] = useState(initTimeArrays);
   const [timeType, setTT] = useState(initTimeType);
+  const [beginDate, setBD] = useState(dayjs());
+  const [hoursPlayed, setHP] = useState(0);
+  const [timeInTotal, setTIT] = useState(entry.gameplayMain)
 
   const calcResult = calculate(
     timeType,
     timeArrays,
-    entry.gameplayMain,
-    new Date(),
-    0,
+    timeInTotal,
+    beginDate.toDate(),
+    hoursPlayed,
   );
 
   return (
@@ -157,11 +164,39 @@ export default function PersonalizeCard({
       </Col>
       <Col span={12}>
         <HalfContentCard>
+          <Radio.Group
+            options={[
+              { label: "Main Story", value: entry.gameplayMain },
+              { label: "Main+Extra", value: entry.gameplayMainExtra },
+              { label: "Completion", value: entry.gameplayCompletionist },
+            ]}
+            value={timeInTotal}
+            onChange={(e) => {
+              setTIT(e.target.value)
+            }}
+            optionType="button"
+            buttonStyle="solid"
+          />
+          <Title level={5}>If you start to play the game on: </Title>
+          <DatePicker
+            value={beginDate}
+            onChange={(date, dateString) => {
+              setBD(date === null ? dayjs() : date);
+            }}
+          />
+          <Title level={5}>And have already played for </Title>
+          <InputNumber
+            value={hoursPlayed}
+            min={0}
+            onChange={(v) => setHP(v === null ? 0 : v)}
+            suffix="Hours"
+          />
+          <Title level={5}>Then...</Title>
           <div>
             <h2>You're about to finish this game:</h2>
             <ul>
-              <li>Start to play: today</li>
-              <li>Hours to go: {entry.gameplayMain}</li>
+              <li>Start to play: {beginDate.toString()}</li>
+              <li>Hours to go: {timeInTotal - hoursPlayed}</li>
               <li>Days to go: {calcResult.daysToGo}</li>
               <li>
                 Finish playing on: {calcResult.endDate?.toLocaleDateString()}
@@ -255,18 +290,7 @@ function calculate(
   beginDate: Date,
   hoursPlayed: number,
 ): CalcResult {
-
   const curArray = timeArrays[timeType];
-  let allZero = true;
-  for (let time of curArray) {
-    if (time != 0) {
-      allZero = false;
-      break;
-    }
-  }
-  if (allZero) {
-    return {} as CalcResult;
-  }
 
   let timeArray = emptyArray();
   switch (timeType) {
@@ -274,7 +298,7 @@ function calculate(
       timeArray = curArray;
       break;
     case 1:
-      [0, 6].forEach((i) => timeArray[i] = curArray[1]);
+      [0, 6].forEach((i) => (timeArray[i] = curArray[1]));
       for (let i = 1; i < 6; ++i) {
         timeArray[i] = curArray[0];
       }
@@ -282,6 +306,17 @@ function calculate(
     case 2:
       timeArray[(6 + beginDate.getDay()) % 7] = curArray[0];
       break;
+  }
+
+  let allZero = true;
+  for (let time of timeArray) {
+    if (time != 0) {
+      allZero = false;
+      break;
+    }
+  }
+  if (allZero) {
+    return {} as CalcResult;
   }
 
   let today = beginDate;

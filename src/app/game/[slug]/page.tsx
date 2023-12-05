@@ -6,18 +6,17 @@ import { Card, Col, Flex, Image, Row, Tag, Typography } from "antd";
 import { Game } from "@/interfaces/game_interfaces";
 import Paragraph from "antd/es/typography/Paragraph";
 import { ReactNode } from "react";
-import { cookies } from "next/headers";
-import CountUp from "react-countup";
-import Statistic from "antd/lib/statistic/Statistic";
-import { Formatter } from "antd/lib/statistic/utils";
 import { TimeStat } from "@/lib/components/TimeStat";
 
-import leven from 'fast-levenshtein'
-import dynamic from 'next/dynamic'
+import leven from "fast-levenshtein";
+import dynamic from "next/dynamic";
 
 const hLTBService = new HowLongToBeatService();
 
-const PersonalizeCard = dynamic(() => import("@/lib/components/PersonalizeCard"), {ssr: false})
+const PersonalizeCard = dynamic(
+  () => import("@/lib/components/PersonalizeCard"),
+  { ssr: false },
+);
 
 const platformDict: Record<number, { name: string; color: string }> = {
   130: { name: "Nintendo Switch", color: "red" },
@@ -59,9 +58,7 @@ export default async function Page({
               <GameInfo entry={entry} detail={detail} />
             </ContentCard>
             <ContentCard>
-              <PersonalizeCard
-                entry={JSON.parse(JSON.stringify(entry))}
-              />
+              <PersonalizeCard entry={JSON.parse(JSON.stringify(entry))} />
             </ContentCard>
           </Flex>
         </main>
@@ -97,12 +94,20 @@ async function getGameDetail(title: string) {
     const result = await fetch("https://api.igdb.com/v4/games", {
       method: "POST",
       headers: myHeaders,
-      body: 'search "' + title + '"; fields rating, name, platforms, summary; limit 10;',
-      cache: 'force-cache'
+      body:
+        'search "' +
+        title +
+        '"; fields rating, name, platforms, summary; limit 10;',
+      cache: "force-cache",
     });
 
-    const raw: { name: string, id: number, platforms: number[], summary: string, rating?: number }[] =
-      await result.json();
+    const raw: {
+      name: string;
+      id: number;
+      platforms: number[];
+      summary: string;
+      rating?: number;
+    }[] = await result.json();
 
     if (!raw || raw.length == 0) {
       throw new Error(
@@ -111,18 +116,18 @@ async function getGameDetail(title: string) {
     }
 
     const obj = raw
-    .toSorted((a, b) => {
-      const n1 = a.rating == undefined ? 1 : 0
-      const n2 = b.rating == undefined ? 1 : 0
+      .toSorted((a, b) => {
+        const n1 = a.rating == undefined ? 1 : 0;
+        const n2 = b.rating == undefined ? 1 : 0;
 
-      return n1 == n2 ? 0 : n1 < n2 ? -1 : 1
-    })
-    .toSorted((a, b) => {
-      const n1 = leven.get(title, a.name)
-      const n2 = leven.get(title, b.name)
+        return n1 == n2 ? 0 : n1 < n2 ? -1 : 1;
+      })
+      .toSorted((a, b) => {
+        const n1 = leven.get(title, a.name);
+        const n2 = leven.get(title, b.name);
 
-      return n1 == n2 ? 0 : n1 < n2 ? -1 : 1
-    })
+        return n1 == n2 ? 0 : n1 < n2 ? -1 : 1;
+      });
 
     const game = obj[0];
     return {
@@ -177,7 +182,11 @@ function GameInfo({
         <Typography style={{}}>
           <Title level={2}>{entry.name}</Title>
           <div style={{ marginBottom: "15px" }}>
-            {detail.platforms?.map((e) => <Tag key={e.name} color={e.color}>{e.name}</Tag>)}
+            {detail.platforms?.map((e) => (
+              <Tag key={e.name} color={e.color}>
+                {e.name}
+              </Tag>
+            ))}
           </div>
           <Paragraph>{detail.description}</Paragraph>
         </Typography>
