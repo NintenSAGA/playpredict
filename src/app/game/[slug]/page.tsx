@@ -132,7 +132,6 @@ async function getGameDetail(title: string) {
     const game = obj[0];
     return {
       description: game.summary,
-      // genre: game.genres?.map((e: any) => e.genre_name),
       platforms: game.platforms
         ?.filter((e) => platformDict[e])
         .map((e) => platformDict[e]),

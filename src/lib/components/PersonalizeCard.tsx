@@ -131,7 +131,7 @@ export default function PersonalizeCard({
   );
 
   return (
-    <Row gutter={20}>
+    <Row gutter={20} style={{width: "100%"}}>
       <Col span={12}>
         <HalfContentCard>
           <Flex gap={"middle"} vertical justify={"flex-start"} align={"start"}>
@@ -265,7 +265,7 @@ function DataDisplayPanel({
           <Col span={6}>
             <TimeStat
               title={"Hour(s) to beat"}
-              value={timeInTotal - hoursPlayed}
+              value={Math.max(timeInTotal - hoursPlayed, 0)}
               suffix={"Hours"}
             />
           </Col>
@@ -379,6 +379,14 @@ function calculate(
   beginDate: Date,
   hoursPlayed: number,
 ): CalcResult | null {
+  if (hoursPlayed > totalHour) {
+    return {
+      daysToGo: 0,
+      endDate: beginDate,
+      heatmapDataArray: []
+    }
+  }
+
   const curArray = timeArrays[timeType];
 
   let timeArray = emptyArray();
