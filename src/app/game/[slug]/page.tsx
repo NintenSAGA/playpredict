@@ -58,7 +58,13 @@ export default async function Page({
               <GameInfo entry={entry} detail={detail} />
             </ContentCard>
             <ContentCard>
-              <PersonalizeCard entry={JSON.parse(JSON.stringify(entry))} />
+              <Flex
+                justify={"center"}
+                align={"center"}
+                style={{ width: "90vw", marginLeft: "-5vw" }}
+              >
+                <PersonalizeCard entry={JSON.parse(JSON.stringify(entry))} />
+              </Flex>
             </ContentCard>
           </Flex>
         </main>

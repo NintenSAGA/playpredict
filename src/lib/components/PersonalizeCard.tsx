@@ -10,8 +10,8 @@ import {
   Row,
   Segmented,
   Slider,
-  Space,
-} from "antd";
+  Space, Tooltip,
+} from 'antd'
 import React, { Dispatch, Fragment, SetStateAction, useState } from "react";
 import Title from "antd/lib/typography/Title";
 import { SliderMarks } from "antd/es/slider";
@@ -257,7 +257,7 @@ function DataDisplayPanel({
             value={hoursPlayed}
             min={0}
             onChange={(v) => setHP(v === null ? 0 : v)}
-            suffix="Hours"
+            suffix="Hour(s)"
           />
         </Space>
 
@@ -266,25 +266,24 @@ function DataDisplayPanel({
             <TimeStat
               title={"Hour(s) to beat"}
               value={Math.max(timeInTotal - hoursPlayed, 0)}
-              suffix={"Hours"}
+              suffix={"Hour(s)"}
             />
           </Col>
           <Col span={6}>
-            {timeType == 2 ? (
-              <TimeStat
-                title={"Week(s) to beat"}
-                value={calcResult.daysToGo / 7}
-                suffix={"Weeks"}
-              />
-            ) : (
-              <TimeStat
-                title={"Day(s) to beat"}
-                value={calcResult.daysToGo}
-                suffix={"Days"}
-              />
-            )}
+            <TimeStat
+              title={"Week(s) to beat"}
+              value={calcResult.daysToGo / 7}
+              suffix={"Week(s)"}
+            />
           </Col>
-          <Col span={12}>
+          <Col span={6}>
+            <TimeStat
+              title={"Day(s) to beat"}
+              value={calcResult.daysToGo}
+              suffix={"Day(s)"}
+            />
+          </Col>
+          <Col span={6}>
             <Statistic
               title={"Beat the game on"}
               value={formatDate(calcResult.endDate)}
