@@ -3,6 +3,12 @@ import { SliderMarks } from 'antd/es/slider'
 export interface CalcResult {
   daysToGo: number;
   endDate: Date;
+  heatmapDataArray: HeatmapData[];
+}
+
+export interface HeatmapData {
+  date: string,
+  count: number,
 }
 
 export interface TimeData {

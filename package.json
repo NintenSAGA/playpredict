@@ -11,6 +11,7 @@
   "dependencies": {
     "@ant-design/cssinjs": "^1.18.0",
     "@notionhq/client": "^2.2.13",
+    "@uiw/react-heat-map": "^2.2.0",
     "antd": "^5.11.5",
     "cookies-next": "^4.1.0",
     "fast-levenshtein": "^3.0.0",
