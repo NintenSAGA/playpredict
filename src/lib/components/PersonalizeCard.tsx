@@ -10,8 +10,9 @@ import {
   Row,
   Segmented,
   Slider,
-  Space, Tooltip,
-} from 'antd'
+  Space,
+  Tooltip,
+} from "antd";
 import React, { Dispatch, Fragment, SetStateAction, useState } from "react";
 import Title from "antd/lib/typography/Title";
 import { SliderMarks } from "antd/es/slider";
@@ -131,7 +132,7 @@ export default function PersonalizeCard({
   );
 
   return (
-    <Row gutter={20} style={{width: "100%"}}>
+    <Row gutter={20} style={{ width: "100%" }}>
       <Col span={12}>
         <HalfContentCard>
           <Flex gap={"middle"} vertical justify={"flex-start"} align={"start"}>
@@ -251,15 +252,21 @@ function DataDisplayPanel({
             }}
           />
         </Space>
-        <Space>
-          <p>And have already played for </p>
-          <InputNumber
-            value={hoursPlayed}
-            min={0}
-            onChange={(v) => setHP(v === null ? 0 : v)}
-            suffix="Hour(s)"
-          />
-        </Space>
+        <Row style={{ width: "1wh" }} justify={'start'} align={'middle'}>
+          <Col span={13}>
+            <p>And have already played for </p>
+          </Col>
+          <Col span={8}>
+            <InputNumber
+              value={hoursPlayed}
+              min={0}
+              max={10000}
+              onChange={(v) => setHP(v === null ? 0 : v)}
+              suffix="Hour(s)"
+              style={{width: '100%'}}
+            />
+          </Col>
+        </Row>
 
         <Row style={{ width: "100%" }}>
           <Col span={8}>
@@ -285,7 +292,6 @@ function DataDisplayPanel({
           </Col>
         </Row>
         <Row style={{ width: "100%" }}>
-
           <Col span={24}>
             <Statistic
               title={"Beat the game on"}
@@ -384,8 +390,8 @@ function calculate(
     return {
       daysToGo: 0,
       endDate: beginDate,
-      heatmapDataArray: []
-    }
+      heatmapDataArray: [],
+    };
   }
 
   const curArray = timeArrays[timeType];
@@ -429,7 +435,7 @@ function calculate(
       sum += timeArray[today.getDay()],
       today.setDate(today.getDate() + 1)
   ) {
-    const delta =timeArray[today.getDay()]
+    const delta = timeArray[today.getDay()];
     if (delta != 0) {
       heatmapDataArray.push({
         date: formatDate(today, "/"),
