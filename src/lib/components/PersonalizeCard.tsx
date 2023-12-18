@@ -263,7 +263,7 @@ function DataDisplayPanel({
 
         <Row style={{ width: "100%" }}>
           <Col span={8}>
-            <TimeStat
+            <Statistic
               title={"Hour(s) to beat"}
               value={Math.max(timeInTotal - hoursPlayed, 0)}
               suffix={"Hour(s)"}
