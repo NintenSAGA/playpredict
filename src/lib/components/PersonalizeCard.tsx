@@ -262,28 +262,31 @@ function DataDisplayPanel({
         </Space>
 
         <Row style={{ width: "100%" }}>
-          <Col span={6}>
+          <Col span={8}>
             <TimeStat
               title={"Hour(s) to beat"}
               value={Math.max(timeInTotal - hoursPlayed, 0)}
               suffix={"Hour(s)"}
             />
           </Col>
-          <Col span={6}>
-            <TimeStat
-              title={"Week(s) to beat"}
-              value={calcResult.daysToGo / 7}
-              suffix={"Week(s)"}
-            />
-          </Col>
-          <Col span={6}>
+          <Col span={8}>
             <TimeStat
               title={"Day(s) to beat"}
               value={calcResult.daysToGo}
               suffix={"Day(s)"}
             />
           </Col>
-          <Col span={6}>
+          <Col span={8}>
+            <TimeStat
+              title={"Week(s) to beat"}
+              value={calcResult.daysToGo / 7}
+              suffix={"Week(s)"}
+            />
+          </Col>
+        </Row>
+        <Row style={{ width: "100%" }}>
+
+          <Col span={24}>
             <Statistic
               title={"Beat the game on"}
               value={formatDate(calcResult.endDate)}
@@ -291,7 +294,6 @@ function DataDisplayPanel({
             />
           </Col>
         </Row>
-
         <HeatMap
           value={calcResult.heatmapDataArray}
           // weekLabels={['S', 'M', 'T', 'W', 'T', 'F', 'S']}
