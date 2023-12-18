@@ -82,7 +82,7 @@ export default async function Home() {
   );
 }
 
-export async function GameCards({ props }: { props: any }) {
+async function GameCards({ props }: { props: any }) {
   const games: Array<Game> = await props.getGames();
   const cardWidth = props.cardWidth;
 
