@@ -1,6 +1,33 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# PlayPredict
 
-## Getting Started
+A website to predict your play time built with Next.js.
+
+Available on [playpredict.vercel.app](https://playpredict.vercel.app/)
+
+## Demo
+
+## Deployment
+
+### Data Sources
+
+* A Notion database page was used as the homepage's backend storage.
+* Time statistic data are acquired through [unofficial HowLongToBeat API](https://github.com/ckatzorke/howlongtobeat)
+* The introduction and platform information of games are acquired through Twitch's [IGDB API](https://api-docs.igdb.com)
+
+Therefore, to let the project run on its full functionality, you have to fill in the following environment variables:
+
+* `TWITCH_CID`
+* `TWITCH_TOKEN`
+* `NOTION_SECRET`
+* `NOTION_PAGE_ID`
+
+> Reference Notion page: [PlayPredict Storage](https://nintensaga.notion.site/3D-456bce089e1a4c8791e23177d26c22be?pvs=4)
+> 
+> Only the cover and attributes `OName` and `Tag` of each game page are used
+
+### Basic Deployment
+
+> Just the same as any other Next.js projects
 
 First, run the development server:
 
