@@ -6,6 +6,8 @@ Available on [playpredict.vercel.app](https://playpredict.vercel.app/)
 
 ## Demo
 
+https://github.com/NintenSAGA/playpredict/assets/72867349/eb9c4457-fc2a-43be-ab85-9eaa7c1123ad
+
 ## Deployment
 
 ### Data Sources
