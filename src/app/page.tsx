@@ -68,14 +68,16 @@ export default async function Home() {
           }}
         />
         {tagList.map((e, i) => {
-          return (
-            <GameRow
-              cardWidth="400px"
-              key={i}
-              title={e}
-              getGames={async () => await getCachedGamesByTag(e)}
-            />
-          );
+          if (process.env.NOTION_SECRET) {
+            return (
+              <GameRow
+                cardWidth="400px"
+                key={i}
+                title={e}
+                getGames={async () => await getCachedGamesByTag(e)}
+              />
+            );
+          }
         })}
       </Flex>
     </main>
